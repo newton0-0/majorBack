@@ -11,7 +11,7 @@ const routes = require('./routes');
 app.use(helmet());
 
 // Allow the domains in the env to make requests to the API
-const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
+// const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 app.use(cors({
     origin: ['*']
 }));
