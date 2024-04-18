@@ -12,6 +12,6 @@ const aiController = require('./aiController');
 router.post('/expert-ai', imageuploads, aiController.expertAI);
 router.post('/verify-ai', imageuploads, aiController.verifyAI);
 
-router.post('/own-ai', aiController.ownAI);
+router.post('/own-ai', imageuploads, aiController.ownAI);
 
 module.exports = router;

@@ -5,13 +5,29 @@ const mimetype = require('mimetype');
 const axios = require('axios');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const ownAI = async (req, res) => {
-    try {
-        // Make a request to the 3rd party API for own AI
-        const response = await axios.post('https://api.example.com/own-ai', req.body);
+const { uploadToS3WithHash } = require('./uploadToAws');
 
-        // Process the response and send it back to the client
-        res.json(response.data);
+const ownAI = async (req, res) => {
+    if (!req.files || !req.files['image']) {
+        return res.status(400).json({ 
+            success: false,
+            error: 'Missing image file.' 
+        });
+    }
+    try {
+        const image = req.files['image'][0];
+        const imageFileName = image.originalname;
+        console.log(imageFileName);
+        const imageUrl = await uploadToS3WithHash(image, imageFileName);
+        console.log('imageUrl', imageUrl);
+        const fetchModelRes = await axios.get(`${process.env.PREDICTION_URL}/prediction?imgPath=${imageUrl}`).
+        then((result) => {
+            console.log('result', result.data);
+            return result.data
+        }).catch((error) => {
+            console.log(error);
+        });
+        res.status(200).json(fetchModelRes);
     } catch (error) {
         // Handle any errors that occur during the request
         console.error(error);
